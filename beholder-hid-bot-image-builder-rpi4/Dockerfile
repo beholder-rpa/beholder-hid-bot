@@ -13,10 +13,13 @@ COPY . .
 # multistage
 FROM node:slim as image
 
-RUN apt-get update && apt-get install -y git
+RUN apt-get update && apt-get install -y git fdisk
 
 WORKDIR /create
 COPY --from=build /build .
+
+# Clone https://github.com/raspberrypi/firmware to get the latest firmware necessary for MSD boot
+RUN git clone https://github.com/raspberrypi/firmware --depth 1
 
 VOLUME /create/images
 

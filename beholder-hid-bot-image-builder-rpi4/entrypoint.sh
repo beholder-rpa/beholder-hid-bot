@@ -17,9 +17,6 @@ fi
 
 echo "Using ${IMAGE_PATH} as the mountable Raspberry Pi OS image"
 
-# Clone https://github.com/raspberrypi/firmware to get the latest firmware necessary for MSD boot
-git clone https://github.com/raspberrypi/firmware --depth 1
-
 # Capture the patition details.
 BOOT_PARTITION=`fdisk -l "${IMAGE_PATH}" | grep "c W95 FAT32 (LBA)"`
 ROOT_PARTITION=`fdisk -l "${IMAGE_PATH}" | grep "83 Linux"`
