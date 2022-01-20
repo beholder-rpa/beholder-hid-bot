@@ -1,0 +1,10 @@
+version: '2'
+
+services:
+  beholder-hid-bot:
+    build:
+      context: .
+      dockerfile: ./beholder-hid-bot/Dockerfile.dev
+    privileged: true
+    environment:
+      - beholder_hid_bot__DiscordToken=${DISCORD_TOKEN}

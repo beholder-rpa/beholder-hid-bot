@@ -1,0 +1,31 @@
+name: "beholder-hid-bot"
+type: "sw.application"
+version: 2022.1.1
+description: "beholder-hid-bot is a Discord Bot that performs keyboard/mouse/joystick actions though text chat commands!"
+post-provisioning: >-
+  ## Usage instructions
+  
+  You'll need to set a variable named `DISCORD_TOKEN` with your Discord token.
+assets:
+  repository:
+    type: "blob.asset"
+    data:
+      url: "https://github.com/beholder-rpa/beholder-hid-bot"
+  logo:
+    type: "blob.asset"
+    data:
+      url: "https://raw.githubusercontent.com/beholder-rpa/beholder-hid-bot/main/images/logo.png"
+data:
+  applicationConfigVariables:
+    - BALENA_HOST_CONFIG_dtparam: '"i2c_arm=on","spi=on","audio=on"'
+    - BALENA_HOST_CONFIG_dtoverlay: '"dwc2","vc4-fkms-v3d"'
+    - BALENA_HOST_CONFIG_gpu_mem: 16
+    - BALENA_HOST_CONFIG_disable_splash: 1
+  applicationEnvironmentVariables:
+    - INTERFACE: 'eth0'
+    - WEBPASSWORD: 'balena'
+    - PIHOLE_DNS_: '1.1.1.1;1.0.0.1'
+    - FBCP_DISPLAY: ""
+  defaultDeviceType: "raspberrypi4-64"
+  supportedDeviceTypes:
+    - "raspberrypi4-64"

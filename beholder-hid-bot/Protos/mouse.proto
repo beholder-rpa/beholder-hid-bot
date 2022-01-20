@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+option csharp_namespace = "beholder_hid_bot.Protos";
+
+package beholder_hid_bot.mouse;
+
+// The stalk mouse service definition.
+service Mouse {
+  // Sends a mouse click
+  rpc SendMouseClick (SendMouseClickRequest) returns (SendMouseClickReply);
+}
+
+message MouseClickDuration {
+    optional uint32 delay = 1;
+    optional uint32 min = 2;
+    optional uint32 max = 3;
+}
+
+message MouseResolution {
+    uint32 horizontal_resolution = 1;
+    uint32 vertical_resolution = 2;
+}
+
+message MouseClick {
+    string button = 1; // Indicates the mouse button name
+    // Indicates a mouse click direction
+    enum ClickDirection {
+        PRESS_AND_RELEASE = 0;
+        PRESS = 1;
+        RELEASE = 2;
+    };
+    optional ClickDirection click_direction = 2;
+    optional MouseClickDuration duration = 3;
+}
+
+message MouseMove {
+    sint32 x = 1;
+    sint32 y = 2;
+}
+
+message MouseScroll {
+    sint32 amount = 1;
+}
+
+message MouseTilt {
+    sint32 amount = 1;
+}
+
+// The request message containing the single mouse click
+message SendMouseClickRequest {
+  MouseClick mouseClick = 1;
+}
+
+message SendMouseClickReply {
+}
+
+message SendMouseActionsRequest {
+  string actions = 1;
+}
+
+message SendMouseRawRequest {
+  bytes report = 1;
+}
+
+message SetAverageMouseClickDurationRequest {
+  MouseClickDuration duration = 1;
+}
+
+message SetAverageMouseClickDurationReply {
+  MouseClickDuration duration = 1;
+}
+
+message MoveMouseToRequest {
+    message Point {
+        int32 x = 1;
+        int32 y = 2;
+    }
+    Point current_position = 1;
+    Point target_position = 2;
+    enum MovementType {
+        Linear = 0;
+        Erratic = 1;
+        Bezier = 2;
+    };
+    MovementType movement_type = 3;
+    float movement_scale_x = 4;
+    float movement_scale_y = 5;
+    int32 movement_speed = 6;
+    int32 movement_delay_ms = 7;
+    string pre_move_actions = 8;
+    string post_move_actions = 9;
+    // Indicates a message topic that, if specified, point data will be published for
+    string points_topic = 10;
+}

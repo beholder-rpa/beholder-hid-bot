@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+option csharp_namespace = "beholder_hid_bot.Protos";
+
+package beholder_hid_bot.joystick;
+
+message JoystickButtonPressDuration {
+    optional uint32 delay = 1;
+    optional uint32 min = 2;
+    optional uint32 max = 3;
+}
+
+message JoystickButtonPress {
+    string button = 1; // Indicates the joystick button name
+    // Indicates a joystick button press direction
+    enum ButtonPressDirection {
+        PRESS_AND_RELEASE = 0;
+        PRESS = 1;
+        RELEASE = 2;
+    };
+    optional ButtonPressDirection press_direction = 2;
+    optional JoystickButtonPressDuration duration = 3;
+}
+
+message JoystickMove {
+    sint32 x = 1;
+    sint32 y = 2;
+}
+
+message JoystickThrottle {
+    sint32 amount = 1;
+}
+
+message SendJoystickButtonPressRequest {
+  JoystickButtonPress buttonPress = 1;
+}
+
+message SendJoystickActionsRequest {
+  string actions = 1;
+}
+
+message SendJoystickRawRequest {
+  bytes report = 1;
+}
+
+message SetAverageJoystickButtonPressDurationRequest {
+  JoystickButtonPressDuration duration = 1;
+}
+
+message SetAverageJoystickButtonPressDurationReply {
+  JoystickButtonPressDuration duration = 1;
+}

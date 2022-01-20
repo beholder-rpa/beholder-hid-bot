@@ -1,0 +1,42 @@
+namespace beholder_hid_bot
+{
+  using beholder_hid_bot.Discord;
+  using beholder_hid_bot.Models;
+  using global::Discord;
+  using global::Discord.WebSocket;
+  using Microsoft.Extensions.Options;
+
+  public class Worker : BackgroundService
+  {
+    private readonly BeholderHidBotOptions _botOptions;
+    private readonly DiscordSocketClient _discordClient;
+    private readonly CommandProcessor _commandProcessor;
+    private readonly ILogger<Worker> _logger;
+
+    public Worker(
+      IOptions<BeholderHidBotOptions> botOptions,
+      DiscordSocketClient discordClient,
+      CommandProcessor commandProcessor,
+      ILogger<Worker> logger)
+    {
+      _botOptions = botOptions?.Value ?? throw new ArgumentNullException(nameof(botOptions));
+      _discordClient = discordClient ?? throw new ArgumentNullException(nameof(discordClient));
+      _commandProcessor = commandProcessor ?? throw new ArgumentNullException(nameof(commandProcessor));
+      _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+      _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+
+      _logger.LogInformation("Logging into Discord...");
+      await _discordClient.LoginAsync(TokenType.Bot, _botOptions.DiscordToken);
+      await _discordClient.StartAsync();
+
+      await _commandProcessor.Initialize();
+
+      // Block this task until the program is closed.
+      await Task.Delay(-1, stoppingToken);
+    }
+  }
+}
