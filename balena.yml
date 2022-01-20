@@ -14,7 +14,7 @@ assets:
   logo:
     type: "blob.asset"
     data:
-      url: "https://raw.githubusercontent.com/beholder-rpa/beholder-hid-bot/main/images/logo.png"
+      url: "https://raw.githubusercontent.com/beholder-rpa/beholder-hid-bot/main/assets/logo.png"
 data:
   applicationConfigVariables:
     - BALENA_HOST_CONFIG_dtparam: '"i2c_arm=on","spi=on","audio=on"'

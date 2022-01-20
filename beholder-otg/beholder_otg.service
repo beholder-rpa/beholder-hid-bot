@@ -1,0 +1,11 @@
+[Unit]
+Description=Beholder OTG
+After=network-online.target beholder_boot.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=beholder_otg.sh
+
+[Install]
+WantedBy=sysinit.target

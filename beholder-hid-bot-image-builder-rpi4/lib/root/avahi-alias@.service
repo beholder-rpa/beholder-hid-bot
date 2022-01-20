@@ -1,0 +1,9 @@
+[Unit]
+Description=Publish %i as alias for %H via mdns
+
+[Service]
+Type=simple
+ExecStart=/bin/bash -c "/usr/bin/avahi-publish -a -R %i $(ifconfig wlan0 | grep -i netmask | awk '{print $2}' | cut -f 2)"
+
+[Install]
+WantedBy=multi-user.target
