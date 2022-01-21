@@ -179,4 +179,5 @@ sed -i -e '/^\/etc\/beholder_init\.sh/d' /etc/rc.local
 rm /etc/beholder_init.sh
 
 # Reboot
+echo "# Rebooting..."
 reboot now

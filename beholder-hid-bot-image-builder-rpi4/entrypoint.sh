@@ -47,9 +47,6 @@ mount -v -o offset=$ROOT_START_BYTE,sizelimit=$ROOT_BYTE_LENGTH -t ext4 "${IMAGE
 
 ./index.js
 
-# Copy updated firmware .elf and .dat files to the boot image.
-cp ./firmware/boot/*.elf ./firmware/boot/*.dat /mnt/image/boot
-
 # Copy generated files on over to the boot image
 cp ./lib/boot/wpa_supplicant.conf /mnt/image/boot
 touch /mnt/image/boot/ssh

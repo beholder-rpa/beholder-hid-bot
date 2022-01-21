@@ -368,3 +368,6 @@ usb-dev/**/*
 !usb-dev/.gitkeep
 
 **/.env
+
+# Ignore DS_Store files anywhere
+.DS_Store
