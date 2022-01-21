@@ -18,7 +18,6 @@ apt-get update && apt-get dist-upgrade -y
 apt-get install -y \
     libffi-dev \
     libssl-dev \
-    '^libssl1.0.[0-9]$' \
     libunwind8 \
     git \
     certbot \
@@ -31,21 +30,21 @@ BITS=$(getconf LONG_BIT)
 ###################################
 # Install Terraform
 if [ "$BITS" = "64" ]; then
-    wget https://releases.hashicorp.com/terraform/1.0.8/terraform_1.0.8_linux_arm64.zip
-    unzip terraform_1.0.8_linux_arm64.zip
+    wget https://releases.hashicorp.com/terraform/1.1.4/terraform_1.1.4_linux_arm64.zip
+    unzip terraform_1.1.4_linux_arm64.zip
     mv terraform /usr/local/bin/
-    rm terraform_1.0.8_linux_arm64.zip
+    rm terraform_1.1.4_linux_arm64.zip
 
-    wget https://github.com/gruntwork-io/terragrunt/releases/download/v0.34.0/terragrunt_linux_arm64
+    wget https://github.com/gruntwork-io/terragrunt/releases/download/v0.36.0/terragrunt_linux_arm64
     chmod +x terragrunt_linux_arm64
     mv terragrunt_linux_arm64 /usr/local/bin/terragrunt
 fi
 
 if [ "$BITS" = "32" ]; then
-    wget https://releases.hashicorp.com/terraform/1.0.8/terraform_1.0.8_linux_arm.zip
-    unzip terraform_1.0.8_linux_arm.zip
+    wget https://releases.hashicorp.com/terraform/1.1.4/terraform_1.1.4_linux_arm.zip
+    unzip terraform_1.1.4_linux_arm.zip
     mv terraform /usr/local/bin/
-    rm terraform_1.0.8_linux_arm.zip
+    rm terraform_1.1.4_linux_arm.zip
 
     # No armhf version of terragrunt
 fi
@@ -61,36 +60,36 @@ echo "# Installing PowerShell..."
 
 if [ "$BITS" = "64" ]; then
     # Grab the latest tar.gz
-    wget https://github.com/PowerShell/PowerShell/releases/download/v7.1.4/powershell-7.1.4-linux-arm64.tar.gz
+    wget https://github.com/PowerShell/PowerShell/releases/download/v7.2.1/powershell-7.2.1-linux-arm64.tar.gz
 
     # Make folder to put powershell
     mkdir /usr/bin/powershell
 
     # Unpack the tar.gz file
-    tar -xvf ./powershell-7.1.4-linux-arm64.tar.gz -C /usr/bin/powershell
+    tar -xvf ./powershell-7.2.1-linux-arm64.tar.gz -C /usr/bin/powershell
 
     # Create a symlink for PowerShell
     ln -s /usr/bin/powershell/pwsh /usr/bin/pwsh
 
     # Remove the tar.gz file
-    rm ./powershell-7.1.4-linux-arm64.tar.gz
+    rm ./powershell-7.2.1-linux-arm64.tar.gz
 fi
 
 if [ "$BITS" = "32" ]; then
     # Grab the latest tar.gz
-    wget https://github.com/PowerShell/PowerShell/releases/download/v7.1.4/powershell-7.1.4-linux-arm32.tar.gz
+    wget https://github.com/PowerShell/PowerShell/releases/download/v7.2.1/powershell-7.2.1-linux-arm32.tar.gz
 
     # Make folder to put powershell
     mkdir /usr/bin/powershell
 
     # Unpack the tar.gz file
-    tar -xvf ./powershell-7.1.4-linux-arm32.tar.gz -C /usr/bin/powershell
+    tar -xvf ./powershell-7.2.1-linux-arm32.tar.gz -C /usr/bin/powershell
 
     # Create a symlink for PowerShell
     ln -s /usr/bin/powershell/pwsh /usr/bin/pwsh
 
     # Remove the tar.gz file
-    rm ./powershell-7.1.4-linux-arm32.tar.gz
+    rm ./powershell-7.2.1-linux-arm32.tar.gz
 fi
 
 # Enable dwc2 on the Pi

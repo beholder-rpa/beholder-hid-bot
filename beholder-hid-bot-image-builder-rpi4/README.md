@@ -15,25 +15,18 @@ Automation to create an initial Beholder HID Bot SD image for the Raspberry Pi 4
 
 ## Building an image
 
-The automated process will download the latest Raspberry Pi OS image and add the necessary bits to run Beholder
+The automated process will download the latest Raspberry Pi OS arm64 image and add the necessary bits to run Beholder (note that Raspios arm64 is currently in beta)
 
 ```
 yarn install
 yarn create-image
 ```
 
-To build an arm64 based image (Raspios arm64 is currently in beta) run
-
-```
-yarn install
-yarn create-image-64
-```
-
 After answering the prompts, flash a SD with the image file located in ./images, Attach it to your Raspberry Pi 4 and let 'er rip.
 
-The first boot process will take a bit of time as updates and dependencies will be installed. Once complete simply SSH into ``beholder@beholder-01.local`` with the default password of ```beholder```
+The first boot process will take a bit of time as updates and dependencies will be installed. Once complete simply SSH into ``beholder@beholder-hid-bot-01.local`` with the default password of ```beholder```
 
-> Note: If you've ssh'd into the Beholder before, use ```ssh-keygen -R beholder-01.local``` to clear the previous host key.
+> Note: If you've ssh'd into the Beholder before, use ```ssh-keygen -R beholder-hid-bot-01.local``` to clear the previous host key.
 
 After the first boot the SD card can be cloned if desired.
 
