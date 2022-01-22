@@ -11,7 +11,7 @@ on:
       - '!beholder-hid-bot/docs/**'
 
 jobs:
-  validate:
+  build:
 
     runs-on: ubuntu-latest
     env:
