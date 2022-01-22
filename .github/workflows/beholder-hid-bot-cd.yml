@@ -1,4 +1,4 @@
-name: Beholder HID Bot PR
+name: Beholder HID Bot CD
 
 on:
   workflow_dispatch:
