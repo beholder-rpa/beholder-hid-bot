@@ -52,16 +52,16 @@ cp ./lib/boot/wpa_supplicant.conf /mnt/image/boot
 touch /mnt/image/boot/ssh
 
 # Copy configuration data on over to the root image
-if (( $BEHOLDER_MODE == "kubeholder" )); then
-  echo "# Setting up Kubeholder..."
-  cp ./lib/root/kubeholder_init.sh /mnt/image/root/etc/beholder_init.sh
-  cp ./lib/root/kubeholder_boot.sh /mnt/image/root/usr/bin/beholder_boot.sh
+if (( $BEHOLDER_MODE == "dotnetbeholder" )); then
+  echo "# Setting up dotnet Beholder..."
+  cp ./lib/root/dotnetbeholder_init.sh /mnt/image/root/etc/beholder_init.sh
+  cp ./lib/root/dotnetbeholder_boot.sh /mnt/image/root/usr/bin/beholder_boot.sh
 
-  cp ./lib/root/kubeholder_userinit.sh /mnt/image/root/etc/
-  chmod +x /mnt/image/root/etc/kubeholder_userinit.sh
+  cp ./lib/root/dotnetbeholder_userinit.sh /mnt/image/root/etc/
+  chmod +x /mnt/image/root/etc/dotnetbeholder_userinit.sh
 
-  cp ./lib/root/kubeholder_userboot.sh /mnt/image/root/etc/
-  chmod +x /mnt/image/root/etc/kubeholder_userboot.sh
+  cp ./lib/root/dotnetbeholder_userboot.sh /mnt/image/root/etc/
+  chmod +x /mnt/image/root/etc/dotnetbeholder_userboot.sh
 else
   echo "# Unknown Mode: $BEHOLDER_MODE"
   exit 1
@@ -90,8 +90,8 @@ ${@:7}
 # Unmount the partitions
 umount /mnt/image/boot
 umount /mnt/image/root
-if (( $BEHOLDER_MODE == "kubeholder" )); then
-  echo "# Kubeholder Raspberry Pi 4 image build completed."
+if (( $BEHOLDER_MODE == "dotnetbeholder" )); then
+  echo "# dotnet Beholder Raspberry Pi 4 image build completed."
 else
   echo "# Unknown Mode: $BEHOLDER_MODE"
   exit 1

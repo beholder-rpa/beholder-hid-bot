@@ -20,4 +20,4 @@ COPY --from=build /build .
 
 VOLUME /create/images
 
-ENTRYPOINT "./entrypoint.sh" "${IMAGE_SUFFIX}" "${WPA_SSID}" "${WPA_PASSPHRASE}" "${RPI_HOSTNAME}" "${RPI_TIMEZONE}" "kubeholder"
+ENTRYPOINT "./entrypoint.sh" "${IMAGE_SUFFIX}" "${WPA_SSID}" "${WPA_PASSPHRASE}" "${RPI_HOSTNAME}" "${RPI_TIMEZONE}" "dotnetbeholder"

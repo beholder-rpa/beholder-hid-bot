@@ -3,7 +3,7 @@
 # Test if is Root
 if [[ $(id -u) -ne 0 ]] ; then echo "Please run as root" ; exit 1 ; fi
 
-echo "# Executing Kubeholder IoT install script"
+echo "# Executing dotnet Beholder IoT install script"
 
 # Update bootloader
 apt update
@@ -24,73 +24,40 @@ apt-get install -y \
     avahi-utils
 apt-get clean
 
-# Get the os bits and set a variable
-BITS=$(getconf LONG_BIT)
-
-###################################
-# Install Terraform
-if [ "$BITS" = "64" ]; then
-    wget https://releases.hashicorp.com/terraform/1.1.4/terraform_1.1.4_linux_arm64.zip
-    unzip terraform_1.1.4_linux_arm64.zip
-    mv terraform /usr/local/bin/
-    rm terraform_1.1.4_linux_arm64.zip
-
-    wget https://github.com/gruntwork-io/terragrunt/releases/download/v0.36.0/terragrunt_linux_arm64
-    chmod +x terragrunt_linux_arm64
-    mv terragrunt_linux_arm64 /usr/local/bin/terragrunt
-fi
-
-if [ "$BITS" = "32" ]; then
-    wget https://releases.hashicorp.com/terraform/1.1.4/terraform_1.1.4_linux_arm.zip
-    unzip terraform_1.1.4_linux_arm.zip
-    mv terraform /usr/local/bin/
-    rm terraform_1.1.4_linux_arm.zip
-
-    # No armhf version of terragrunt
-fi
-
-###################################
-# Download and install arkade
-curl -sLS https://get.arkade.dev | sh
-
 ###################################
 # Download and extract PowerShell
 
 echo "# Installing PowerShell..."
 
-if [ "$BITS" = "64" ]; then
-    # Grab the latest tar.gz
-    wget https://github.com/PowerShell/PowerShell/releases/download/v7.2.1/powershell-7.2.1-linux-arm64.tar.gz
+# Grab the latest tar.gz
+wget https://github.com/PowerShell/PowerShell/releases/download/v7.2.1/powershell-7.2.1-linux-arm64.tar.gz
 
-    # Make folder to put powershell
-    mkdir /usr/bin/powershell
+# Make folder to put powershell
+mkdir /usr/bin/powershell
 
-    # Unpack the tar.gz file
-    tar -xvf ./powershell-7.2.1-linux-arm64.tar.gz -C /usr/bin/powershell
+# Unpack the tar.gz file
+tar -xvf ./powershell-7.2.1-linux-arm64.tar.gz -C /usr/bin/powershell
 
-    # Create a symlink for PowerShell
-    ln -s /usr/bin/powershell/pwsh /usr/bin/pwsh
+# Create a symlink for PowerShell
+ln -s /usr/bin/powershell/pwsh /usr/bin/pwsh
 
-    # Remove the tar.gz file
-    rm ./powershell-7.2.1-linux-arm64.tar.gz
-fi
+# Remove the tar.gz file
+rm ./powershell-7.2.1-linux-arm64.tar.gz
 
-if [ "$BITS" = "32" ]; then
-    # Grab the latest tar.gz
-    wget https://github.com/PowerShell/PowerShell/releases/download/v7.2.1/powershell-7.2.1-linux-arm32.tar.gz
+###################################
+# Download and extract the dotnet core 6.0 SDK
 
-    # Make folder to put powershell
-    mkdir /usr/bin/powershell
+# Grab the latest tar.gz
+wget https://download.visualstudio.microsoft.com/download/pr/d43345e2-f0d7-4866-b56e-419071f30ebe/68debcece0276e9b25a65ec5798cf07b/dotnet-sdk-6.0.101-linux-arm64.tar.gz
 
-    # Unpack the tar.gz file
-    tar -xvf ./powershell-7.2.1-linux-arm32.tar.gz -C /usr/bin/powershell
+# Make folder to put dotnet
+mkdir /usr/bin/dotnet
 
-    # Create a symlink for PowerShell
-    ln -s /usr/bin/powershell/pwsh /usr/bin/pwsh
+# Unpack the tar.gz file
+tar -xvf ./dotnet-sdk-6.0.101-linux-arm64.tar.gz -C /usr/bin/dotnet
 
-    # Remove the tar.gz file
-    rm ./powershell-7.2.1-linux-arm32.tar.gz
-fi
+# Create a symlink for dotnet
+ln -s /usr/bin/dotnet/dotnet /usr/bin/dotnet
 
 # Enable dwc2 on the Pi
 if ! $(grep -q dtoverlay=dwc2 /boot/config.txt) ; then
@@ -162,11 +129,11 @@ echo 'beholder:beholder' | chpasswd
 echo 'beholder ALL=(ALL:ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/010_beholder-nopasswd
 usermod -L -s /bin/false -e 1 pi
 
-cp /etc/kubeholder_userinit.sh /home/beholder/.init
+cp /etc/dotnetbeholder_userinit.sh /home/beholder/.init
 chown beholder:beholder /home/beholder/.init
 chmod +x /home/beholder/.init
 
-cp /etc/kubeholder_userboot.sh /home/beholder/.boot
+cp /etc/dotnetbeholder_userboot.sh /home/beholder/.boot
 chown beholder:beholder /home/beholder/.boot
 chmod +x /home/beholder/.boot
 
