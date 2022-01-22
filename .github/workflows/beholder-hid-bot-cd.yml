@@ -52,16 +52,17 @@ jobs:
         run: cp ${{ github.workspace }}/beholder-hid-bot/*.sh ${{ github.workspace }}/beholder-hid-bot/bin/Release/net6.0/linux-arm64/publish/
       - 
         name: gzip artifacts
-        run: gzip -r ${{ github.workspace }}/beholder-hid-bot/bin/Release/net6.0/linux-arm64/publish/ > ${{ github.workspace }}/beholder-hid-bot-arm64.tar.gz
+        run: gzip -r ${{ github.workspace }}/beholder-hid-bot/bin/Release/net6.0/linux-arm64/publish/ > ./beholder-hid-bot-arm64.tar.gz
       -
         name: Release
         uses: softprops/action-gh-release@v1
         with:
           name: CD Build
           body: Continuous Delivery Build
-          tag_name: v${{ github.event.pull_request.head.ref }}-prerelease
+          tag_name: cd-prerelease
           prerelease: true
-          files: ${{ github.workspace }}/beholder-hid-bot/beholder-hid-bot-arm64.tar.gz
+          files: |
+            beholder-hid-bot-arm64.tar.gz
 
 
       
