@@ -40,10 +40,24 @@ jobs:
         run: dotnet restore --runtime linux-arm64
       - 
         name: Build
-        run: dotnet publish --configuration Release --no-restore --runtime linux-arm64 --self-contained
+        run: dotnet publish --configuration Release --no-restore --runtime linux-arm64 --no-self-contained
       -
         name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: beholder-hid-bot-arm64
           path: ${{ github.workspace }}/beholder-hid-bot/bin/Release/net6.0/linux-arm64/publish/
+      - 
+        name: gzip artifacts
+        run: gzip -r beholder-hid-bot-arm64.tar.gz ${{ github.workspace }}/beholder-hid-bot/bin/Release/net6.0/linux-arm64/publish/
+      -
+        name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: CD Build
+          body: Continuous Delivery Build
+          prerelease: true
+          files: beholder-hid-bot-arm64.tar.gz
+
+
+      
