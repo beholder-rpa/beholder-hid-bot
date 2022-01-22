@@ -52,7 +52,7 @@ jobs:
         run: 'cp ${{ github.workspace }}/beholder-hid-bot/*.sh ${{ github.workspace }}/beholder-hid-bot/bin/Release/net6.0/linux-arm64/publish/ || :'
       - 
         name: compress artifacts
-        run: tar -czvf beholder-hid-bot-arm64.tar.gz ${{ github.workspace }}/beholder-hid-bot/bin/Release/net6.0/linux-arm64/publish/
+        run: tar -czvf beholder-hid-bot-arm64.tar.gz -C ${{ github.workspace }}/beholder-hid-bot/bin/Release/net6.0/linux-arm64/publish/ .
       -
         name: Release
         uses: softprops/action-gh-release@v1
