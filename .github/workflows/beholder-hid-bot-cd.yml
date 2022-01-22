@@ -48,6 +48,9 @@ jobs:
           name: beholder-hid-bot-arm64
           path: ${{ github.workspace }}/beholder-hid-bot/bin/Release/net6.0/linux-arm64/publish/
       - 
+        name: include OTG files
+        run: 'mkdir -p ${{ github.workspace }}/beholder-hid-bot/bin/Release/net6.0/linux-arm64/publish/beholder-otg && cp ${{ github.workspace }}/beholder-otg/*.* ${{ github.workspace }}/beholder-hid-bot/bin/Release/net6.0/linux-arm64/publish/beholder-otg || :'
+      - 
         name: include scripts
         run: 'cp ${{ github.workspace }}/beholder-hid-bot/*.sh ${{ github.workspace }}/beholder-hid-bot/bin/Release/net6.0/linux-arm64/publish/ || :'
       - 

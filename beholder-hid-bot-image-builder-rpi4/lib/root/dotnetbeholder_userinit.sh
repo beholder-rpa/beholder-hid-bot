@@ -6,7 +6,7 @@ mkdir ~/beholder-hid-bot
 tar -xvf ./beholder-hid-bot-arm64.tar.gz -C ~/beholder-hid-bot
 rm beholder-hid-bot-arm64.tar.gz
 
-# If an init script exists in the cloned beholder folder, run it
+# If an init script exists in the cloned beholder-hid-bot folder, run it
 if [ -f ~/beholder-hid-bot/init.sh ]; then
   ~/beholder-hid-bot/init.sh
 fi

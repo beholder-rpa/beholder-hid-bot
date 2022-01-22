@@ -51,13 +51,13 @@ rm ./powershell-7.2.1-linux-arm64.tar.gz
 wget https://download.visualstudio.microsoft.com/download/pr/d43345e2-f0d7-4866-b56e-419071f30ebe/68debcece0276e9b25a65ec5798cf07b/dotnet-sdk-6.0.101-linux-arm64.tar.gz
 
 # Make folder to put dotnet
-mkdir /usr/bin/dotnet
+mkdir /usr/bin/.dotnet
 
 # Unpack the tar.gz file
-tar -xvf ./dotnet-sdk-6.0.101-linux-arm64.tar.gz -C /usr/bin/dotnet
+tar -xvf ./dotnet-sdk-6.0.101-linux-arm64.tar.gz -C /usr/bin/.dotnet
 
 # Create a symlink for dotnet
-ln -s /usr/bin/dotnet/dotnet /usr/bin/dotnet
+ln -s /usr/bin/.dotnet/dotnet /usr/bin/dotnet
 
 # Enable dwc2 on the Pi
 if ! $(grep -q dtoverlay=dwc2 /boot/config.txt) ; then
