@@ -56,6 +56,7 @@ jobs:
         with:
           name: CD Build
           body: Continuous Delivery Build
+          tag_name: v${{ github.event.pull_request.head.ref }}-prerelease
           prerelease: true
           files: ${{ github.workspace }}/beholder-hid-bot-arm64.tar.gz
 
