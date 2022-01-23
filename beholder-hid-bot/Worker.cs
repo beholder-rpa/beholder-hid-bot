@@ -38,12 +38,17 @@ public class Worker : BackgroundService
 
     if (string.IsNullOrWhiteSpace(discordToken))
     {
+      _logger.LogInformation("A discord token was not found as part of configuration. Falling back to the DISCORD_TOKEN environment variable.");
       discordToken = _configuration["DISCORD_TOKEN"];
+      foreach(var c in _configuration.GetChildren())
+      {
+        _logger.LogInformation($"{c.Key}: {c.Value}");
+      }
     }
 
     if (string.IsNullOrWhiteSpace(discordToken))
     {
-      _logger.LogCritical("A Discord Token was not specified. Exiting");
+      _logger.LogCritical("A Discord Token could not be located in configuration. Exiting");
       _hostApplicationLifetime.StopApplication();
       return;
     }
