@@ -12,17 +12,21 @@ public class Worker : BackgroundService
   private readonly DiscordSocketClient _discordClient;
   private readonly CommandProcessor _commandProcessor;
   private readonly ILogger<Worker> _logger;
+  private readonly IHostApplicationLifetime _hostApplicationLifetime;
 
   public Worker(
     IOptions<BeholderHidBotOptions> botOptions,
     DiscordSocketClient discordClient,
     CommandProcessor commandProcessor,
-    ILogger<Worker> logger)
+    ILogger<Worker> logger,
+    IHostApplicationLifetime hostApplicationLifetime)
   {
     _botOptions = botOptions?.Value ?? throw new ArgumentNullException(nameof(botOptions));
     _discordClient = discordClient ?? throw new ArgumentNullException(nameof(discordClient));
     _commandProcessor = commandProcessor ?? throw new ArgumentNullException(nameof(commandProcessor));
     _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    _hostApplicationLifetime =
+      hostApplicationLifetime ?? throw new ArgumentNullException(nameof(hostApplicationLifetime));
   }
 
   protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -37,6 +41,7 @@ public class Worker : BackgroundService
     if (string.IsNullOrWhiteSpace((discordToken)))
     {
       _logger.LogCritical("A Discord Token was not specified. Exiting");
+      _hostApplicationLifetime.StopApplication();
       return;
     }
     _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
