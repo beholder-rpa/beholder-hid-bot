@@ -74,7 +74,14 @@ namespace beholder_hid_bot.HardwareInterfaceDevices
           var lowerKey = key.ToLowerInvariant();
           if (Modifiers.ContainsKey(lowerKey))
           {
-            modifierBytes = (byte?)(modifierBytes | Modifiers[lowerKey]);
+            if (modifierBytes == null)
+            {
+              modifierBytes = Modifiers[lowerKey];
+            }
+            else
+            {
+              modifierBytes = (byte)(modifierBytes | Modifiers[lowerKey]);
+            }
           }
         }
       }

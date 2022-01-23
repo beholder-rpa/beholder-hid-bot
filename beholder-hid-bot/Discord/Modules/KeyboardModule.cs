@@ -19,8 +19,6 @@
     public async Task SendKeys([Remainder][Summary("The text to echo")] string echo)
     {
       await _keyboard.SendKeys(echo);
-        
-      await ReplyAsync(echo);
     }
 
     [Command("sendkey")]
@@ -29,8 +27,6 @@
     public async Task SendKey([Remainder][Summary("The key to send")] string key)
     {
       await _keyboard.SendKey(key);
-
-      await ReplyAsync(key);
     }
 
     [Command("sendkeysreset")]
