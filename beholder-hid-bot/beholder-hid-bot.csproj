@@ -8,7 +8,7 @@
     <RootNamespace>beholder_hid_bot</RootNamespace>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	<DockerfileFile>Dockerfile</DockerfileFile>
-	<DockerfileRunArguments>--privileged -e hid__keyboard__devPath=/app/usb-dev/hidg0 -e hid__mouse__devPath=/app/usb-dev/hidg1 -e hid__joystick__devPath=/app/usb-dev/hidg2 --env-file .env </DockerfileRunArguments>
+	<DockerfileRunArguments>--privileged -e DISCORD_TOKEN=foobar -e hid__keyboard__devPath=/app/usb-dev/hidg0 -e hid__mouse__devPath=/app/usb-dev/hidg1 -e hid__joystick__devPath=/app/usb-dev/hidg2 --env-file .env </DockerfileRunArguments>
   </PropertyGroup>
 
   <ItemGroup>

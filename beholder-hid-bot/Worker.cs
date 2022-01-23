@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 
 public class Worker : BackgroundService
 {
+  private readonly IConfiguration _configuration;
   private readonly BeholderHidBotOptions _botOptions;
   private readonly DiscordSocketClient _discordClient;
   private readonly CommandProcessor _commandProcessor;
@@ -15,12 +16,14 @@ public class Worker : BackgroundService
   private readonly IHostApplicationLifetime _hostApplicationLifetime;
 
   public Worker(
+    IConfiguration configuration,
     IOptions<BeholderHidBotOptions> botOptions,
     DiscordSocketClient discordClient,
     CommandProcessor commandProcessor,
     ILogger<Worker> logger,
     IHostApplicationLifetime hostApplicationLifetime)
   {
+    _configuration = configuration ?? throw new ArgumentNullException(nameof(botOptions));
     _botOptions = botOptions?.Value ?? throw new ArgumentNullException(nameof(botOptions));
     _discordClient = discordClient ?? throw new ArgumentNullException(nameof(discordClient));
     _commandProcessor = commandProcessor ?? throw new ArgumentNullException(nameof(commandProcessor));
@@ -35,7 +38,7 @@ public class Worker : BackgroundService
 
     if (string.IsNullOrWhiteSpace(discordToken))
     {
-      discordToken = Environment.GetEnvironmentVariable("DISCORD_TOKEN");
+      discordToken = _configuration["DISCORD_TOKEN"];
     }
 
     if (string.IsNullOrWhiteSpace(discordToken))
