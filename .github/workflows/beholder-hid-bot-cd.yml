@@ -66,6 +66,7 @@ jobs:
           prerelease: true
           files: |
             beholder-hid-bot/beholder-hid-bot-arm64.tar.gz
+            docker-compose.yml
 
 
       

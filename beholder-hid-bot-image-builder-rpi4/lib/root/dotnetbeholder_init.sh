@@ -15,14 +15,27 @@ apt autoremove -y
 # Install dependencies
 echo "# Installing dependencies..."
 apt-get update && apt-get dist-upgrade -y
+curl -sSL https://get.docker.com | sh
+usermod -aG docker pi
 apt-get install -y \
     libffi-dev \
     libssl-dev \
     libunwind8 \
+    python3 \
+    python3-pip \
     git \
     certbot \
     avahi-utils
+apt-get remove -y python-configparser
+pip3 -v install docker-compose
 apt-get clean
+
+###################################
+# Download and install ctop
+
+echo "# Downloading ctop arm64"
+curl -Lo /usr/local/bin/ctop https://github.com/bcicen/ctop/releases/download/0.7.6/ctop-0.7.6-linux-arm64
+chmod +x /usr/local/bin/ctop
 
 ###################################
 # Download and extract PowerShell
@@ -64,6 +77,7 @@ echo 'export DOTNET_ROOT=/usr/bin/.dotnet' >> /etc/profile
 
 # Add the dotnet core 6.0 SDK to sudoers
 echo 'Defaults env_keep += "DOTNET_ROOT"' > /etc/sudoers.d/010_dotnet-root-export
+echo 'Defaults env_keep += "DISCORD_TOKEN"' >> /etc/sudoers.d/010_dotnet-root-export
 
 # Remove the tar.gz file
 rm ./dotnet-sdk-6.0.101-linux-arm64.tar.gz
