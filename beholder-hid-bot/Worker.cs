@@ -33,12 +33,12 @@ public class Worker : BackgroundService
   {
     var discordToken = _botOptions.DiscordToken;
 
-    if (string.IsNullOrWhiteSpace((discordToken)))
+    if (string.IsNullOrWhiteSpace(discordToken))
     {
       discordToken = Environment.GetEnvironmentVariable("DISCORD_TOKEN");
     }
 
-    if (string.IsNullOrWhiteSpace((discordToken)))
+    if (string.IsNullOrWhiteSpace(discordToken))
     {
       _logger.LogCritical("A Discord Token was not specified. Exiting");
       _hostApplicationLifetime.StopApplication();
