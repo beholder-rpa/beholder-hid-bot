@@ -47,7 +47,7 @@ public class Worker : BackgroundService
     _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
 
     _logger.LogInformation("Logging into Discord...");
-    await _discordClient.LoginAsync(TokenType.Bot, _botOptions.DiscordToken);
+    await _discordClient.LoginAsync(TokenType.Bot, discordToken);
     await _discordClient.StartAsync();
 
     await _commandProcessor.Initialize();
