@@ -15,7 +15,7 @@
 
     [Command("sendkeys")]
     [Summary("Sends a sequence of keyboard commands")]
-    [Remarks("foo")]
+    [Remarks("{Left-Shift down}h{Left-Shift up}ello, !world{!}")]
     public async Task SendKeys([Remainder][Summary("The text to echo")] string echo)
     {
       await _keyboard.SendKeys(echo);
@@ -31,6 +31,16 @@
       await _keyboard.SendKey(key);
 
       await ReplyAsync(key);
+    }
+
+    [Command("sendkeysreset")]
+    [Summary("Resets the keyboard")]
+    [Remarks("{oemtilde}")]
+    public async Task SendKeyReset()
+    {
+      _keyboard.SendKeysReset();
+
+      await ReplyAsync("Keys Reset.");
     }
   }
 }

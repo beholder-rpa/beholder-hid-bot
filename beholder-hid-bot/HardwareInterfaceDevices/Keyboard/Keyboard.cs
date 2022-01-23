@@ -29,8 +29,8 @@ namespace beholder_hid_bot.HardwareInterfaceDevices
     public Keyboard(IConfiguration config, ILogger<Keyboard> logger)
         : base(config["hid:keyboard:devPath"])
     {
-      uint keyMin = 60;
-      uint keyMax = 170;
+      uint keyMin = 40;
+      uint keyMax = 150;
 
       if (uint.TryParse(config["beholder_stalk_keymin"], out uint configKeyMin))
       {
@@ -160,6 +160,7 @@ namespace beholder_hid_bot.HardwareInterfaceDevices
 
     protected void OnKeyboardLedChanged(KeyboardLedsChangedEventArgs e)
     {
+      _logger.LogInformation("Keyboard Leds Changed: {newValue}", e.KeyboardLeds);
       KeyboardLedsChanged?.Invoke(this, e);
     }
 
