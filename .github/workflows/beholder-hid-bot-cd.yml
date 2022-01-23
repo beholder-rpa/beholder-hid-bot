@@ -71,6 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       working-directory: ./beholder-hid-bot
+      cache-key: beholder-hid-bot-docker-cd
 
     defaults:
       run:
