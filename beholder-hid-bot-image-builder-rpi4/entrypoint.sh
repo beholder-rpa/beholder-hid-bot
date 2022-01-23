@@ -76,6 +76,8 @@ chmod 644 /mnt/image/root/etc/systemd/system/beholder_boot.service
 cp ./lib/root/hostname /mnt/image/root/etc/
 cp ./lib/root/timezone /mnt/image/root/etc/
 
+echo "127.0.0.1       $RPI_HOSTNAME" | tee -a /mnt/image/root/etc/hosts
+
 cp ./lib/root/avahi-daemon.conf /mnt/image/root/etc/avahi/
 chmod 644 /mnt/image/root/etc/avahi/avahi-daemon.conf
 

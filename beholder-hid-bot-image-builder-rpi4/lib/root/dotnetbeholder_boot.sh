@@ -9,12 +9,19 @@ if [ -f "/home/beholder/.init" ]
 then
     # Run one-time initialization
 
-    # Initialize services
-    systemctl enable beholder_otg.service
-
     # Run user initialization
     sudo -u beholder /home/beholder/.init
     rm /home/beholder/.init
+
+    # copy the OTG service to the /etc/systemd/system folder
+    echo "# Updating Beholder OTG."
+    cp /home/beholder/beholder-hid-bot/beholder-otg/beholder_otg.service /etc/systemd/system/
+    cp /home/beholder/beholder-hid-bot/beholder-otg/beholder_otg.sh /usr/bin/
+    chmod 644 /etc/systemd/system/beholder_otg.service
+    chmod +x /usr/bin/beholder_otg.sh
+
+    # Initialize services
+    systemctl enable beholder_otg.service
 
     echo "# Completed initial run of the Beholder HID Bot boot script - rebooting..."
     reboot now

@@ -30,7 +30,7 @@ apt-get clean
 echo "# Installing PowerShell..."
 
 # Grab the latest tar.gz
-wget https://github.com/PowerShell/PowerShell/releases/download/v7.2.1/powershell-7.2.1-linux-arm64.tar.gz
+wget -q --show-progress https://github.com/PowerShell/PowerShell/releases/download/v7.2.1/powershell-7.2.1-linux-arm64.tar.gz
 
 # Make folder to put powershell
 mkdir /usr/bin/powershell
@@ -48,7 +48,7 @@ rm ./powershell-7.2.1-linux-arm64.tar.gz
 # Download and extract the dotnet core 6.0 SDK
 
 # Grab the latest tar.gz
-wget https://download.visualstudio.microsoft.com/download/pr/d43345e2-f0d7-4866-b56e-419071f30ebe/68debcece0276e9b25a65ec5798cf07b/dotnet-sdk-6.0.101-linux-arm64.tar.gz
+wget -q --show-progress https://download.visualstudio.microsoft.com/download/pr/d43345e2-f0d7-4866-b56e-419071f30ebe/68debcece0276e9b25a65ec5798cf07b/dotnet-sdk-6.0.101-linux-arm64.tar.gz
 
 # Make folder to put dotnet
 mkdir /usr/bin/.dotnet
@@ -58,6 +58,18 @@ tar -xvf ./dotnet-sdk-6.0.101-linux-arm64.tar.gz -C /usr/bin/.dotnet
 
 # Create a symlink for dotnet
 ln -s /usr/bin/.dotnet/dotnet /usr/bin/dotnet
+
+# Add the dotnet core 6.0 SDK to the profile
+echo 'export DOTNET_ROOT=/usr/bin/.dotnet' >> /etc/profile
+
+# Add the dotnet core 6.0 SDK to sudoers
+echo 'Defaults env_keep += "DOTNET_ROOT"' > /etc/sudoers.d/010_dotnet-root-export
+
+# Remove the tar.gz file
+rm ./dotnet-sdk-6.0.101-linux-arm64.tar.gz
+
+###################################
+# Continue with RPi configuration
 
 # Enable dwc2 on the Pi
 if ! $(grep -q dtoverlay=dwc2 /boot/config.txt) ; then
