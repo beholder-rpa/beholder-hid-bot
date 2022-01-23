@@ -13,19 +13,20 @@ namespace beholder_hid_bot.HardwareInterfaceDevices
   /// </summary>
   public partial class Keyboard : HumanInterfaceDevice
   {
-    private static readonly object s_reportLock = new object();
+    private static readonly object s_reportLock = new();
     private static readonly byte[] s_currentReport = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
     //Key Regex, based loosely off of https://www.autohotkey.com/docs/commands/Send.htm#keynames
-    private static readonly Regex KeysRegex = new Regex(
+    private static readonly Regex KeysRegex = new(
         @"(?:(?<![\{])(?<Modifiers>[!+^#]*?)(?<Key>[^{!+^#])(?![^{!+^#]*?[\}])|(?:(?<KeyNameModifiers>[!+^#]*?)\{(?<KeyName>[^}]+?)(?:\s?(?:(?<Repeats>\d+)|(?<Direction>down|up)))?\}))"
         , RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
     public event EventHandler<KeyboardLedsChangedEventArgs>? KeyboardLedsChanged;
 
     private readonly byte[] sizeBuffer = new byte[1];
+    private readonly ILogger<Keyboard> _logger;
 
-    public Keyboard(IConfiguration config)
+    public Keyboard(IConfiguration config, ILogger<Keyboard> logger)
         : base(config["hid:keyboard:devPath"])
     {
       uint keyMin = 60;
@@ -42,6 +43,8 @@ namespace beholder_hid_bot.HardwareInterfaceDevices
       }
 
       AverageKeypressDuration = new KeypressDuration() { Min = keyMin, Max = keyMax };
+
+      _logger = logger ?? throw new ArgumentNullException(nameof(logger));
       WatchNext();
     }
 
@@ -327,6 +330,7 @@ namespace beholder_hid_bot.HardwareInterfaceDevices
       // Now that we have the keypresses, press them.
       foreach (var keypress in keypresses)
       {
+        _logger.LogInformation("Pressing key '{key}' {direction} {modifiers}for {duration}", keypress.Key, keypress.KeyDirection, keypress.Modifiers.Count == 0 ? "" : $"with {keypress.Modifiers} ", keypress.Duration);
         await SendKey(keypress.Key, keypress.KeyDirection, keypress.Modifiers, keypress.Duration);
       }
     }
