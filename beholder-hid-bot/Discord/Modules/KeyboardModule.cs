@@ -53,13 +53,16 @@
     [Remarks("{oemtilde}")]
     public Task KeyboardStart(string name, string keys, double delay, int max)
     {
-      _keyboardSessions.TryAdd(name, new KeyboardSession()
+      if (_keyboardSessions.TryAdd(name, new KeyboardSession()
       {
         Name = name,
         Keys = keys,
         RepeatDelaySeconds = delay,
         MaxRepeats = max,
-      });
+      }))
+      {
+        _logger.LogInformation("Started keyboard session for {sessionName} - Press '{keys}' every {delay}s until {max} or ended.", name, keys, delay, max);
+      }
       return Task.CompletedTask;
     }
 
@@ -68,7 +71,10 @@
     [Remarks("{oemtilde}")]
     public Task KeyboardEnd(string name)
     {
-      _keyboardSessions.Remove(name);
+      if (_keyboardSessions.Remove(name))
+      {
+        _logger.LogInformation("Removed keyboard session for {sessionName}", name);
+      }
       return Task.CompletedTask;
     }
 
