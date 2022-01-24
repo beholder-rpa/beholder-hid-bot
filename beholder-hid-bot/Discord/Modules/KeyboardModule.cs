@@ -2,15 +2,24 @@
 {
   using beholder_hid_bot.HardwareInterfaceDevices;
   using global::Discord.Commands;
-  using System.Threading.Tasks;
+  using System.Collections.Concurrent;
+  using System.Timers;
 
   public class KeyboardModule : ModuleBase<SocketCommandContext>
   {
+    private readonly object _sessionLock = new();
     private readonly Keyboard _keyboard;
+    private readonly ILogger<KeyboardModule> _logger;
+    private readonly IDictionary<string, KeyboardSession> _keyboardSessions = new ConcurrentDictionary<string, KeyboardSession>();
+    private readonly Timer _keyboardSessionTimer = new(100);
 
-    public KeyboardModule(Keyboard keyboard)
+    public KeyboardModule(Keyboard keyboard, ILogger<KeyboardModule> logger)
     {
       _keyboard = keyboard ?? throw new ArgumentNullException(nameof(keyboard));
+      _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+      _keyboardSessionTimer.Elapsed += ProcessKeyboardSessions;
+      _keyboardSessionTimer.AutoReset = true;
+      _keyboardSessionTimer.Enabled = true;
     }
 
     [Command("sendkeys")]
@@ -37,6 +46,55 @@
       _keyboard.SendKeysReset();
 
       await ReplyAsync("Keys Reset.");
+    }
+
+    [Command("kstart")]
+    [Summary("Starts a keyboard button mashing session")]
+    [Remarks("{oemtilde}")]
+    public Task KeyboardStart(string name, string keys, double delay, int max)
+    {
+      _keyboardSessions.TryAdd(name, new KeyboardSession()
+      {
+        Name = name,
+        Keys = keys,
+        RepeatDelaySeconds = delay,
+        MaxRepeats = max,
+      });
+      return Task.CompletedTask;
+    }
+
+    [Command("kend")]
+    [Summary("Ends a keyboard button mashing session")]
+    [Remarks("{oemtilde}")]
+    public Task KeyboardEnd(string name)
+    {
+      _keyboardSessions.Remove(name);
+      return Task.CompletedTask;
+    }
+
+    private void ProcessKeyboardSessions(object? source, ElapsedEventArgs e)
+    {
+      if (Monitor.TryEnter(_sessionLock, -1))
+      {
+        foreach (var session in _keyboardSessions.Values)
+        {
+          if (session.Presses >= session.MaxRepeats)
+          {
+            _keyboardSessions.Remove(session.Name);
+            continue;
+          }
+
+          if (session.Presses == 0 || e.SignalTime - session.LastPress >= TimeSpan.FromSeconds(session.RepeatDelaySeconds))
+          {
+            _keyboard.SendKeys(session.Keys).GetAwaiter().GetResult();
+            session.LastPress = DateTime.Now;
+            session.Presses++;
+            continue;
+          }
+        }
+
+        Monitor.Exit(_sessionLock);
+      }
     }
   }
 }

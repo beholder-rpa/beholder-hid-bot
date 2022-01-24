@@ -3,6 +3,7 @@
   using global::Discord.Commands;
   using global::Discord.WebSocket;
   using System.Reflection;
+  using System.Text.RegularExpressions;
   using System.Threading.Tasks;
 
   public class CommandProcessor
@@ -10,6 +11,8 @@
     private readonly IServiceProvider _services;
     private readonly DiscordSocketClient _client;
     private readonly CommandService _commands;
+
+    private readonly Regex RelayMessagePattern = new(@"^\[(?<TimeStamp>\d+:\d+:\d+:\d+)\]\s+\[(?<Channel>.*?)\]\s+\[(?<User>.*?)\]:\s+%(?<Command>.*?)\s+?(?<Args>.*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     // Retrieve client and CommandService instance via ctor
     public CommandProcessor(IServiceProvider services, DiscordSocketClient client, CommandService commands)
@@ -44,12 +47,29 @@
       // Create a number to track where the prefix ends and the command begins
       int argPos = 0;
 
-      // Determine if the message is a command based on the prefix
-      if (!(message.HasCharPrefix('%', ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos)))
-        return;
+      SocketCommandContext? context = null;
+      if (RelayMessagePattern.IsMatch(message.Content))
+      {
+        var match = RelayMessagePattern.Match(message.Content);
+        var ctx = new RelaySocketCommandContext(_client, message)
+        {
+          TimeStamp = match.Groups["TimeStamp"].Value,
+          RelayChannel = match.Groups["Channel"].Value,
+          RelayUser = match.Groups["User"].Value
+        };
+        argPos = message.Content.IndexOf('%') + 1;
+        context = ctx;
+      }
+      else if (message.HasCharPrefix('%', ref argPos))
+      {
+        // Create a WebSocket-based command context based on the message
+        context = new SocketCommandContext(_client, message);
+      }
 
-      // Create a WebSocket-based command context based on the message
-      var context = new SocketCommandContext(_client, message);
+      if (context == null)
+      {
+        return;
+      }
 
       // Execute the command with the command context we just
       // created, along with the service provider for precondition checks.
