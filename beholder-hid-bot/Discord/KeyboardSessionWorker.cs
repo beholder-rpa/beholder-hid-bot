@@ -1,0 +1,59 @@
+﻿namespace beholder_hid_bot.Discord
+{
+  using beholder_hid_bot.HardwareInterfaceDevices;
+  using System;
+  using System.Collections.Concurrent;
+  using System.Collections.Generic;
+  using System.Timers;
+
+  public class KeyboardSessionWorker
+  {
+    private readonly Keyboard _keyboard;
+    private readonly object _sessionLock = new();
+    private readonly IDictionary<string, KeyboardSession> _keyboardSessions = new ConcurrentDictionary<string, KeyboardSession>();
+    private readonly Timer _keyboardSessionTimer = new(100);
+
+    public KeyboardSessionWorker(Keyboard keyboard)
+    {
+      _keyboard = keyboard ?? throw new ArgumentNullException(nameof(keyboard));
+      _keyboardSessionTimer.Elapsed += ProcessKeyboardSessions;
+      _keyboardSessionTimer.AutoReset = true;
+      _keyboardSessionTimer.Enabled = true;
+    }
+
+    public bool TryAdd(string name, KeyboardSession session)
+    {
+      return _keyboardSessions.TryAdd(name, session);
+    }
+
+    public bool Remove(string name)
+    {
+      return _keyboardSessions.Remove(name);
+    }
+
+    private void ProcessKeyboardSessions(object? source, ElapsedEventArgs e)
+    {
+      if (Monitor.TryEnter(_sessionLock, -1))
+      {
+        foreach (var session in _keyboardSessions.Values)
+        {
+          if (session.Presses >= session.MaxRepeats)
+          {
+            _keyboardSessions.Remove(session.Name);
+            continue;
+          }
+
+          if (session.Presses == 0 || e.SignalTime - session.LastPress >= TimeSpan.FromSeconds(session.RepeatDelaySeconds))
+          {
+            _keyboard.SendKeys(session.Keys).GetAwaiter().GetResult();
+            session.LastPress = DateTime.Now;
+            session.Presses++;
+            continue;
+          }
+        }
+
+        Monitor.Exit(_sessionLock);
+      }
+    }
+  }
+}

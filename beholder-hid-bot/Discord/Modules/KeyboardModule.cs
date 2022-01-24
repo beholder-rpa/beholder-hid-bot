@@ -7,19 +7,15 @@
 
   public class KeyboardModule : ModuleBase<SocketCommandContext>
   {
-    private readonly object _sessionLock = new();
     private readonly Keyboard _keyboard;
+    private readonly KeyboardSessionWorker _keyboardSessionWorker;
     private readonly ILogger<KeyboardModule> _logger;
-    private readonly IDictionary<string, KeyboardSession> _keyboardSessions = new ConcurrentDictionary<string, KeyboardSession>();
-    private readonly Timer _keyboardSessionTimer = new(100);
 
-    public KeyboardModule(Keyboard keyboard, ILogger<KeyboardModule> logger)
+    public KeyboardModule(Keyboard keyboard, KeyboardSessionWorker keyboardSessionWorker, ILogger<KeyboardModule> logger)
     {
       _keyboard = keyboard ?? throw new ArgumentNullException(nameof(keyboard));
+      _keyboardSessionWorker = keyboardSessionWorker ?? throw new ArgumentNullException(nameof(keyboardSessionWorker));
       _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-      _keyboardSessionTimer.Elapsed += ProcessKeyboardSessions;
-      _keyboardSessionTimer.AutoReset = true;
-      _keyboardSessionTimer.Enabled = true;
     }
 
     [Command("sendkeys")]
@@ -53,7 +49,7 @@
     [Remarks("{oemtilde}")]
     public Task KeyboardStart(string name, string keys, double delay, int max)
     {
-      if (_keyboardSessions.TryAdd(name, new KeyboardSession()
+      if (_keyboardSessionWorker.TryAdd(name, new KeyboardSession()
       {
         Name = name,
         Keys = keys,
@@ -71,36 +67,11 @@
     [Remarks("{oemtilde}")]
     public Task KeyboardEnd(string name)
     {
-      if (_keyboardSessions.Remove(name))
+      if (_keyboardSessionWorker.Remove(name))
       {
         _logger.LogInformation("Removed keyboard session for {sessionName}", name);
       }
       return Task.CompletedTask;
-    }
-
-    private void ProcessKeyboardSessions(object? source, ElapsedEventArgs e)
-    {
-      if (Monitor.TryEnter(_sessionLock, -1))
-      {
-        foreach (var session in _keyboardSessions.Values)
-        {
-          if (session.Presses >= session.MaxRepeats)
-          {
-            _keyboardSessions.Remove(session.Name);
-            continue;
-          }
-
-          if (session.Presses == 0 || e.SignalTime - session.LastPress >= TimeSpan.FromSeconds(session.RepeatDelaySeconds))
-          {
-            _keyboard.SendKeys(session.Keys).GetAwaiter().GetResult();
-            session.LastPress = DateTime.Now;
-            session.Presses++;
-            continue;
-          }
-        }
-
-        Monitor.Exit(_sessionLock);
-      }
     }
   }
 }

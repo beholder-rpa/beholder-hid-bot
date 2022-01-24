@@ -4,6 +4,7 @@ using beholder_hid_bot.HardwareInterfaceDevices;
 using beholder_hid_bot.Models;
 using Discord.Commands;
 using Discord.WebSocket;
+using System.Collections.Concurrent;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
@@ -59,6 +60,9 @@ IHost host = Host.CreateDefaultBuilder(args)
        });
 
       services.AddSingleton<Keyboard>();
+
+      services.AddSingleton<KeyboardSessionWorker>();
+
       services.AddSingleton<Mouse>();
       services.AddSingleton<MouseObserver>();
       services.AddSingleton<Joystick>();
