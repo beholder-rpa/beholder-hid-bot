@@ -13,8 +13,8 @@ public class WoWChatBot : IObserver<IWoWChatEvent>
   private static readonly Regex SendKeysRegex = new(@"^%sendkeys\s+(?<Keys>.*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
   private static readonly Regex SendKeyRegex = new(@"^%sendkey\s+(?<Key>.*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
   private static readonly Regex SendKeysResetRegex = new(@"^%sendkeysreset$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-  private static readonly Regex KstartRegex = new(@"^%kstart\s+(?<Name>.*)\s+(?<Keys>.*)\s+(?<Delay>\d*)\s+(?<Max>\d*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-  private static readonly Regex KendRegex = new(@"^%kend\s+(?<Name>.*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+  private static readonly Regex KstartRegex = new(@"^%kstart\s+""?(?<Name>.*)""?\s+(?<Keys>.*)\s+(?<Delay>\d*)\s+(?<Max>\d*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+  private static readonly Regex KendRegex = new(@"^%kend\s+""?(?<Name>.*)""?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
   private readonly Keyboard _keyboard;
   private readonly KeyboardSessionWorker _keyboardSessionWorker;
