@@ -1,4 +1,4 @@
-﻿namespace beholder_hid_bot.Discord
+﻿namespace beholder_hid_bot.Bot
 {
   using beholder_hid_bot.HardwareInterfaceDevices;
   using System;

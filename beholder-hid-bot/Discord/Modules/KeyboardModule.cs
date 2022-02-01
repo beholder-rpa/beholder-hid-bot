@@ -1,9 +1,8 @@
 ﻿namespace beholder_hid_bot.Discord.Modules
 {
   using beholder_hid_bot.HardwareInterfaceDevices;
+  using beholder_hid_bot.Bot;
   using global::Discord.Commands;
-  using System.Collections.Concurrent;
-  using System.Timers;
 
   public class KeyboardModule : ModuleBase<SocketCommandContext>
   {

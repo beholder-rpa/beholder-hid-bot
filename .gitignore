@@ -371,3 +371,6 @@ usb-dev/**/*
 
 # Ignore DS_Store files anywhere
 .DS_Store
+
+# Local AppSettings
+appsettings.local.json
