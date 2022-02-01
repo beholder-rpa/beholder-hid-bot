@@ -13,7 +13,8 @@ public class WoWChatBot : IObserver<IWoWChatEvent>
   private static readonly Regex SendKeysRegex = new(@"^%sendkeys\s+(?<Keys>.*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
   private static readonly Regex SendKeyRegex = new(@"^%sendkey\s+(?<Key>.*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
   private static readonly Regex SendKeysResetRegex = new(@"^%sendkeysreset$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-  private static readonly Regex KstartRegex = new(@"^%kstart\s+""?(?<Name>.*)""?\s+(?<Keys>.*)\s+(?<Delay>\d*)\s+(?<Max>\d*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+  private static readonly Regex KstartRegex = new(@"^%kstart\s+""?(?<Name>.*)""?\s+(?<Keys>.*)\s+(?<Delay>((\d+(\.\d*)?)|(\.\d+))*)\s+(?<Max>\d*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+  private static readonly Regex KupdateRegex = new(@"^%kupdate\s+""?(?<Name>.*)""?\s+(?<Keys>.*)\s+(?<Delay>((\d+(\.\d*)?)|(\.\d+))*)\s+(?<Max>\d*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
   private static readonly Regex KendRegex = new(@"^%kend\s+""?(?<Name>.*)""?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
   private readonly Keyboard _keyboard;
@@ -52,20 +53,39 @@ public class WoWChatBot : IObserver<IWoWChatEvent>
         _keyboard.SendKeysReset();
         break;
       case var txt when KstartRegex.IsMatch(txt):
-        var kstartMatch = KstartRegex.Match(txt);
-        var kstartName = kstartMatch.Groups["Name"].Value;
-        var keys = kstartMatch.Groups["Keys"].Value;
-        var delay = int.Parse(kstartMatch.Groups["Delay"].Value);
-        var max = int.Parse(kstartMatch.Groups["Max"].Value);
-        if (_keyboardSessionWorker.TryAdd(kstartName, new KeyboardSession()
         {
-          Name = kstartName,
-          Keys = keys,
-          RepeatDelaySeconds = delay,
-          MaxRepeats = max,
-        }))
+          var kstartMatch = KstartRegex.Match(txt);
+          var kstartName = kstartMatch.Groups["Name"].Value;
+          var keys = kstartMatch.Groups["Keys"].Value;
+          var delay = double.Parse(kstartMatch.Groups["Delay"].Value);
+          var max = int.Parse(kstartMatch.Groups["Max"].Value);
+          if (_keyboardSessionWorker.TryAdd(kstartName, new KeyboardSession()
+          {
+            Name = kstartName,
+            Keys = keys,
+            RepeatDelaySeconds = delay,
+            MaxRepeats = max,
+          }))
+          {
+            _logger.LogInformation("Started keyboard session for {sessionName} - Press '{keys}' every {delay}s until {max} or ended.", kstartName, keys, delay, max);
+          }
+        }
+        break;
+      case var txt when KupdateRegex.IsMatch(txt):
         {
-          _logger.LogInformation("Started keyboard session for {sessionName} - Press '{keys}' every {delay}s until {max} or ended.", kstartName, keys, delay, max);
+          var kupdateMatch = KupdateRegex.Match(txt);
+          var kupdatename = kupdateMatch.Groups["Name"].Value;
+          var keys = kupdateMatch.Groups["Keys"].Value;
+          var delay = double.Parse(kupdateMatch.Groups["Delay"].Value);
+          var max = int.Parse(kupdateMatch.Groups["Max"].Value);
+          _keyboardSessionWorker.AddOrUpdate(kupdatename, new KeyboardSession()
+          {
+            Name = kupdatename,
+            Keys = keys,
+            RepeatDelaySeconds = delay,
+            MaxRepeats = max,
+          });
+          _logger.LogInformation("Add/Updated keyboard session for {sessionName} - Press '{keys}' every {delay}s until {max} or ended.", kupdatename, keys, delay, max);
         }
         break;
       case var txt when KendRegex.IsMatch(txt):

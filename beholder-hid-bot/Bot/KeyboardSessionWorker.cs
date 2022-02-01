@@ -10,7 +10,7 @@
   {
     private readonly Keyboard _keyboard;
     private readonly object _sessionLock = new();
-    private readonly IDictionary<string, KeyboardSession> _keyboardSessions = new ConcurrentDictionary<string, KeyboardSession>();
+    private readonly ConcurrentDictionary<string, KeyboardSession> _keyboardSessions = new ConcurrentDictionary<string, KeyboardSession>();
     private readonly Timer _keyboardSessionTimer = new(100);
 
     public KeyboardSessionWorker(Keyboard keyboard)
@@ -26,9 +26,14 @@
       return _keyboardSessions.TryAdd(name, session);
     }
 
+    public void AddOrUpdate(string name, KeyboardSession session)
+    {
+      _keyboardSessions.AddOrUpdate(name, session, (name, ks) => session);
+    }
+
     public bool Remove(string name)
     {
-      return _keyboardSessions.Remove(name);
+      return _keyboardSessions.Remove(name, out KeyboardSession _);
     }
 
     private void ProcessKeyboardSessions(object? source, ElapsedEventArgs e)
@@ -39,7 +44,7 @@
         {
           if (session.Presses >= session.MaxRepeats)
           {
-            _keyboardSessions.Remove(session.Name);
+            _keyboardSessions.Remove(session.Name, out KeyboardSession _);
             continue;
           }
 
