@@ -16,6 +16,9 @@ public class WoWChatBot : IObserver<IWoWChatEvent>
   private static readonly Regex KstartRegex = new(@"^%kstart\s+""?(?<Name>.*)""?\s+(?<Keys>.*)\s+(?<Delay>((\d+(\.\d*)?)|(\.\d+))*)\s+(?<Max>\d*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
   private static readonly Regex KupdateRegex = new(@"^%kupdate\s+""?(?<Name>.*)""?\s+(?<Keys>.*)\s+(?<Delay>((\d+(\.\d*)?)|(\.\d+))*)\s+(?<Max>\d*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
   private static readonly Regex KendRegex = new(@"^%kend\s+""?(?<Name>.*)""?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+  private static readonly Regex BstartRegex = new(@"^%bstart\s+""?(?<Name>.*)""?\s+(?<Duration>((\d+(\.\d*)?)|(\.\d+))*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+  private static readonly Regex BupdateRegex = new(@"^%bupdate\s+""?(?<Name>.*)""?\s+(?<Duration>((\d+(\.\d*)?)|(\.\d+))*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+  private static readonly Regex BendRegex = new(@"^%bend\s+""?(?<Name>.*)""?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
   private readonly Keyboard _keyboard;
   private readonly KeyboardSessionWorker _keyboardSessionWorker;
@@ -93,6 +96,41 @@ public class WoWChatBot : IObserver<IWoWChatEvent>
         if (_keyboardSessionWorker.Remove(kendName))
         {
           _logger.LogInformation("Removed keyboard session for {sessionName}", kendName);
+        }
+        break;
+      case var txt when BstartRegex.IsMatch(txt):
+        {
+          var bstartMatch = BstartRegex.Match(txt);
+          var bstartName = bstartMatch.Groups["Name"].Value;
+          var duration = double.Parse(bstartMatch.Groups["Duration"].Value);
+          if (_keyboardSessionWorker.TryAddBlock(bstartName, new BlockSession()
+          {
+            Name = bstartName,
+            Duration = duration,
+          }))
+          {
+            _logger.LogInformation("Started block session for {sessionName} - Blocking keys for {duration}s or ended.", bstartName, duration);
+          }
+        }
+        break;
+      case var txt when BupdateRegex.IsMatch(txt):
+        {
+          var bupdateMatch = BupdateRegex.Match(txt);
+          var bupdateName = bupdateMatch.Groups["Name"].Value;
+          var duration = double.Parse(bupdateMatch.Groups["Duration"].Value);
+          _keyboardSessionWorker.AddOrUpdateBlock(bupdateName, new BlockSession()
+          {
+            Name = bupdateName,
+            Duration = duration,
+          });
+          _logger.LogInformation("Add/updated block session for {sessionName} - Blocking keys for {duration}s or ended.", bupdateName, duration);
+        }
+        break;
+      case var txt when BendRegex.IsMatch(txt):
+        var bendname = BendRegex.Match(txt).Groups["Name"].Value;
+        if (_keyboardSessionWorker.RemoveBlock(bendname))
+        {
+          _logger.LogInformation("Removed block session for {sessionName}", bendname);
         }
         break;
     }
