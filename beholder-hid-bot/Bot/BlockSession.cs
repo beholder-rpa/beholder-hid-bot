@@ -6,6 +6,6 @@
 
     public double Duration { get; init; } = 1;
 
-    public DateTime? ExpiresAt { get; init; } = DateTime.MinValue;
+    public DateTime ExpiresAt { get; init; } = DateTime.MinValue;
   }
 }

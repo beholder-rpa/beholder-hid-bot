@@ -97,7 +97,7 @@
         var now = DateTime.Now;
         foreach (var session in _blockSessions.Values)
         {
-          if (session.ExpiresAt >= now)
+          if (session.ExpiresAt < now)
           {
             _blockSessions.Remove(session.Name, out BlockSession _);
             continue;
