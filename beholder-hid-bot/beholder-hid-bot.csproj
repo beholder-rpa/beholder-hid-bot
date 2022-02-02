@@ -21,7 +21,7 @@
 		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		<PrivateAssets>all</PrivateAssets>
 	</PackageReference>
-	<PackageReference Include="WoWChat.Net" Version="0.1.1-beta-gbbb5d96d06" />
+	<PackageReference Include="WoWChat.Net" Version="0.1.3-beta-gc700624a4c" />
   </ItemGroup>
 
   <ItemGroup>
