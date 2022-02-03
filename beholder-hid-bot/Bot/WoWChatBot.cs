@@ -161,7 +161,7 @@ public class WoWChatBot : IObserver<IWoWChatEvent>
         break;
       case var txt when RendRegex.IsMatch(txt):
         var rendName = RendRegex.Match(txt).Groups["Name"].Value;
-        if (_keyboardSessionWorker.Remove(rendName))
+        if (_keyboardSessionWorker.RemoveRepeat(rendName))
         {
           _logger.LogInformation("Removed repeat session for {sessionName}", rendName);
         }
