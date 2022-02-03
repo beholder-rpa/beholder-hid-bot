@@ -11,10 +11,13 @@
     private readonly Keyboard _keyboard;
     private readonly object _sessionLock = new();
     private readonly object _blockLock = new();
-    private readonly ConcurrentDictionary<string, KeyboardSession> _keyboardSessions = new ConcurrentDictionary<string, KeyboardSession>();
-    private readonly ConcurrentDictionary<string, BlockSession> _blockSessions = new ConcurrentDictionary<string, BlockSession>();
+    private readonly object _repeatLock = new();
+    private readonly ConcurrentDictionary<string, KeyboardSession> _keyboardSessions = new();
+    private readonly ConcurrentDictionary<string, BlockSession> _blockSessions = new();
+    private readonly ConcurrentDictionary<string, RepeatSession> _repeatSessions = new();
     private readonly Timer _keyboardSessionTimer = new(100);
     private readonly Timer _blockSessionTimer = new(25);
+    private readonly Timer _repeatSessionTimer = new(25);
 
     public KeyboardSessionWorker(Keyboard keyboard)
     {
@@ -26,6 +29,10 @@
       _blockSessionTimer.Elapsed += ProcessBlockSessions;
       _blockSessionTimer.AutoReset = true;
       _blockSessionTimer.Enabled = true;
+
+      _repeatSessionTimer.Elapsed += ProcessRepeatSessions;
+      _repeatSessionTimer.AutoReset = true;
+      _repeatSessionTimer.Enabled = true;
     }
 
     public bool TryAdd(string name, KeyboardSession session)
@@ -36,6 +43,11 @@
     public bool TryAddBlock(string name, BlockSession session)
     {
       return _blockSessions.TryAdd(name, session with { ExpiresAt = DateTime.Now.AddSeconds(session.Duration)});
+    }
+
+    public bool TryAddRepeat(string name, RepeatSession session)
+    {
+      return _repeatSessions.TryAdd(name, session);
     }
 
     public void AddOrUpdate(string name, KeyboardSession session)
@@ -57,6 +69,11 @@
     public bool RemoveBlock(string name)
     {
       return _blockSessions.Remove(name, out BlockSession _);
+    }
+
+    public bool RemoveRepeat(string name)
+    {
+      return _repeatSessions.Remove(name, out RepeatSession _);
     }
 
     private void ProcessKeyboardSessions(object? source, ElapsedEventArgs e)
@@ -94,10 +111,9 @@
     {
       if (Monitor.TryEnter(_blockLock, -1))
       {
-        var now = DateTime.Now;
         foreach (var session in _blockSessions.Values)
         {
-          if (session.ExpiresAt < now)
+          if (session.ExpiresAt < e.SignalTime)
           {
             _blockSessions.Remove(session.Name, out BlockSession _);
             continue;
@@ -105,6 +121,30 @@
         }
 
         Monitor.Exit(_blockLock);
+      }
+    }
+
+    private void ProcessRepeatSessions(object? source, ElapsedEventArgs e)
+    {
+      if (Monitor.TryEnter(_repeatLock, -1))
+      {
+        foreach (var session in _repeatSessions.Values)
+        {
+          if (session.LastTriggered == null || e.SignalTime - session.LastTriggered >= TimeSpan.FromSeconds(session.IntervalSeconds))
+          {
+            AddOrUpdate(session.Name, new KeyboardSession()
+            {
+              Name = session.Name,
+              Keys = session.Keys,
+              RepeatDelaySeconds = session.RepeatDelaySeconds,
+              MaxRepeats = session.MaxRepeats,
+            });
+            session.LastTriggered = DateTime.Now;
+            continue;
+          }
+        }
+
+        Monitor.Exit(_repeatLock);
       }
     }
   }

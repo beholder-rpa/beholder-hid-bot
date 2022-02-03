@@ -13,12 +13,17 @@ public class WoWChatBot : IObserver<IWoWChatEvent>
   private static readonly Regex SendKeysRegex = new(@"^%sendkeys\s+(?<Keys>.*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
   private static readonly Regex SendKeyRegex = new(@"^%sendkey\s+(?<Key>.*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
   private static readonly Regex SendKeysResetRegex = new(@"^%sendkeysreset$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+  
   private static readonly Regex KstartRegex = new(@"^%kstart\s+""?(?<Name>.*)""?\s+(?<Keys>.*)\s+(?<Delay>((\d+(\.\d*)?)|(\.\d+))*)\s+(?<Max>\d*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
   private static readonly Regex KupdateRegex = new(@"^%kupdate\s+""?(?<Name>.*)""?\s+(?<Keys>.*)\s+(?<Delay>((\d+(\.\d*)?)|(\.\d+))*)\s+(?<Max>\d*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
   private static readonly Regex KendRegex = new(@"^%kend\s+""?(?<Name>.*)""?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+  
   private static readonly Regex BstartRegex = new(@"^%bstart\s+""?(?<Name>.*)""?\s+(?<Duration>((\d+(\.\d*)?)|(\.\d+))*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
   private static readonly Regex BupdateRegex = new(@"^%bupdate\s+""?(?<Name>.*)""?\s+(?<Duration>((\d+(\.\d*)?)|(\.\d+))*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
   private static readonly Regex BendRegex = new(@"^%bend\s+""?(?<Name>.*)""?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+  private static readonly Regex RstartRegex = new(@"^%rstart\s+""?(?<Name>.*)""?\s+(?<Keys>.*)\s+(?<Interval>((\d+(\.\d*)?)|(\.\d+))*)\s+(?<Delay>((\d+(\.\d*)?)|(\.\d+))*)\s+(?<Max>\d*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+  private static readonly Regex RendRegex = new(@"^%rend\s+""?(?<Name>.*)""?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
   private readonly Keyboard _keyboard;
   private readonly KeyboardSessionWorker _keyboardSessionWorker;
@@ -131,6 +136,34 @@ public class WoWChatBot : IObserver<IWoWChatEvent>
         if (_keyboardSessionWorker.RemoveBlock(bendname))
         {
           _logger.LogInformation("Removed block session for {sessionName}", bendname);
+        }
+        break;
+      case var txt when RstartRegex.IsMatch(txt):
+        {
+          var rstartMatch = RstartRegex.Match(txt);
+          var rstartName = rstartMatch.Groups["Name"].Value;
+          var keys = rstartMatch.Groups["Keys"].Value;
+          var interval = double.Parse(rstartMatch.Groups["Interval"].Value);
+          var delay = double.Parse(rstartMatch.Groups["Delay"].Value);
+          var max = int.Parse(rstartMatch.Groups["Max"].Value);
+          if (_keyboardSessionWorker.TryAddRepeat(rstartName, new RepeatSession()
+          {
+            Name = rstartName,
+            Keys = keys,
+            IntervalSeconds = interval,
+            RepeatDelaySeconds = delay,
+            MaxRepeats = max,
+          }))
+          {
+            _logger.LogInformation("Started repeat session for {sessionName} - Repeats every {interval}s - Press '{keys}' every {delay}s until {max} or ended.", rstartName, interval, keys, delay, max);
+          }
+        }
+        break;
+      case var txt when RendRegex.IsMatch(txt):
+        var rendName = RendRegex.Match(txt).Groups["Name"].Value;
+        if (_keyboardSessionWorker.Remove(rendName))
+        {
+          _logger.LogInformation("Removed repeat session for {sessionName}", rendName);
         }
         break;
     }
