@@ -6,8 +6,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "beholder-image:download": "wget -c -L https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2021-11-08/2021-10-30-raspios-bullseye-arm64-lite.zip -O ./images/raspios_lite_arm64_2021-10-30.zip",
-    "beholder-image:expand": "unzip -o ./images/raspios_lite_arm64_2021-10-30.zip -d ./images",
+    "beholder-image:download": "wget -c -L https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2022-01-28/2022-01-28-raspios-bullseye-arm64-lite.zip -O ./images/raspios_lite_arm64_2022-01-28.zip",
+    "beholder-image:expand": "unzip -o ./images/raspios_lite_arm64_2022-01-28.zip -d ./images",
     "beholder-image:build": "dotenv -- docker build -t beholder-image-builder .",
     "beholder-image:create": "dotenv -- docker run -it --rm --privileged -v $PWD/images/:/create/images/ -e IMAGE_SUFFIX=arm64-lite -e WPA_SSID -e WPA_PASSPHRASE -e RPI_HOSTNAME -e RPI_TIMEZONE -t beholder-image-builder beholder-image-builder",
     "create-image": "run-s beholder-image:download beholder-image:expand beholder-image:build \"beholder-image:create {@}\"",
