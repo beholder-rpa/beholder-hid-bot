@@ -43,7 +43,7 @@ jobs:
         run: dotnet publish --configuration Release --no-restore --runtime linux-arm64 --no-self-contained
       -
         name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: beholder-hid-bot-arm64
           path: ${{ github.workspace }}/beholder-hid-bot/bin/Release/net6.0/linux-arm64/publish/
